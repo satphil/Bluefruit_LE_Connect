@@ -8,34 +8,17 @@
 
 import XCTest
 
-public extension Float {
-    /**
-    Returns a random floating point number between 0.0 and 1.0, inclusive.
-    By DaRkDOG, modified by Phil
-    */
-    public static func random() -> Float {
-        return Float(arc4random()) / 0xFFFF_FFFF
-    }
-    /**
-    Create a random num Float
-    :param: lower number Float
-    :param: upper number Float
-    :return: random number Float
-    By DaRkDOG
-    */
-    public static func random(min min: Int, max: Int) -> Float {
-        return Float.random() * Float((max - min) + min)
-    }
-}
+let minSense = -0x4_000  // = -2^14
+let maxSense = 0x4_000  // = +2^14
 
 class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
+    
     var vc:PostureViewController?
-    let minSense = -0x4_000  // = -2^14
-    let maxSense = 0x4_000  // = +2^14
     var testSensor = SensorData(
-        accel: Vector(x: 0.0,y: 0.0,z: 0.0),
-        mag: Vector(x: 0.0,y: 0.0,z: 0.0),
-        gyro: Vector(x: 0.0,y: 0.0,z: 0.0))
+        accel: Vector(x: 0,y: 0,z: 0),
+        mag: Vector(x: 0,y: 0,z: 0),
+        gyro: Vector(x: 0,y: 0,z: 0))
+    var status: PostureStatus = PostureStatus.OK
     
     override func setUp() {
         super.setUp()
@@ -49,19 +32,45 @@ class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
         super.tearDown()
     }
     
+    func randomSense(min min: Int = minSense, max: Int = maxSense) -> Int {
+        return Int(arc4random_uniform(UInt32(max-min+1))) + min
+    }
+
+    func prepSensorData(posture: PostureStatus) {
+        testSensor.accel.x = randomSense()
+        testSensor.accel.y = randomSense()
+        testSensor.accel.z = randomSense()
+        testSensor.gyro.y = randomSense()
+        switch posture {
+        case PostureStatus.OK:
+            testSensor.gyro.x = randomSense(min: -gyroTrigger, max: gyroTrigger)
+            testSensor.gyro.z = randomSense(min: -gyroTrigger, max: gyroTrigger)
+        case PostureStatus.Forward:
+            testSensor.gyro.x = randomSense(min: gyroTrigger+1, max: maxSense)
+            testSensor.gyro.z = randomSense(min: -gyroTrigger, max: gyroTrigger)
+        case PostureStatus.Back:
+            testSensor.gyro.x = randomSense(min: minSense, max: -gyroTrigger-1)
+            testSensor.gyro.z = randomSense(min: -gyroTrigger, max: gyroTrigger)
+        case PostureStatus.Left:
+            testSensor.gyro.x = randomSense(min: -gyroTrigger, max: gyroTrigger)
+            testSensor.gyro.z = randomSense(min: gyroTrigger+1, max: maxSense)
+        case PostureStatus.Right:
+            testSensor.gyro.x = randomSense(min: -gyroTrigger, max: gyroTrigger)
+            testSensor.gyro.z = randomSense(min: minSense, max: -gyroTrigger-1)
+        }
+        testSensor.mag.x = randomSense()
+        testSensor.mag.y = randomSense()
+        testSensor.mag.z = randomSense()
+    }
+    
     func testCalculatePostureStatusGood() {
-        for _ in 1...triggerCount+2 {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
-            XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.OK, "sent good posture data but did get an OK response")
+        for i in 1...triggerCount+2 {
+            prepSensorData(PostureStatus.OK)
+            status = vc!.calculatePostureStatus(testSensor)
+            if i > triggerCount {
+                XCTAssert(status == PostureStatus.OK, "sent good posture data but did not get an OK response")
             }
+        }
     }
     
     func testCalculatePostureStatusMixed() {
@@ -70,54 +79,29 @@ class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
         // then send data representing lean forward posture data
         
         for _ in 1..<triggerCount {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: gyroTrigger+1, max: maxSense)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
+            prepSensorData(PostureStatus.Forward)
+            testSensor.gyro.x = randomSense(min: gyroTrigger+1, max: gyroTrigger+gyroTrigger/triggerCount)
             XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.OK, "sent too few lean forward posture data but didn't get OK response")
         }
         // then send data representing lean back posture data
         for _ in 1..<triggerCount {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: minSense, max: -gyroTrigger-1)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
+            prepSensorData(PostureStatus.Back)
+            testSensor.gyro.x = randomSense(min: -gyroTrigger-gyroTrigger/triggerCount, max: -gyroTrigger-1)
             XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.OK, "sent too few lean back posture data but didn't get OK response")
         }
+        // nullify any lingering "back" measurements with a forward one
+        testSensor.gyro.x = randomSense(min: gyroTrigger+1, max: gyroTrigger+gyroTrigger/triggerCount)
+        XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.OK, "sent too few lean forward posture data but didn't get OK response")
         // then send data representing lean left posture data
         for _ in 1..<triggerCount {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: gyroTrigger+1, max: maxSense)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
+            prepSensorData(PostureStatus.Left)
+            testSensor.gyro.z = randomSense(min: gyroTrigger+1, max: gyroTrigger+gyroTrigger/triggerCount)
             XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.OK, "sent too few lean left posture data but didn't get OK response")
         }
         // then send data representing lean right posture data
         for _ in 1..<triggerCount {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: minSense, max: -gyroTrigger-1)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
+            prepSensorData(PostureStatus.Right)
+            testSensor.gyro.z = randomSense(min: -gyroTrigger-gyroTrigger/triggerCount, max: -gyroTrigger-1)
             XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.OK, "sent too few lean right posture data but didn't get OK response")
         }
         testCalculatePostureStatusGood() // send some more good posture data
@@ -127,59 +111,31 @@ class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
         testCalculatePostureStatusGood() // send some good posture data to begin with
         // then send data representing lean forward posture data
         for _ in 1...triggerCount {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: gyroTrigger+1, max: maxSense)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
-            XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.Forward, "sent lean forward posture data but didn't get 'forward' response")
+            prepSensorData(PostureStatus.Forward)
+            status = vc!.calculatePostureStatus(testSensor)
         }
+        XCTAssert( status == PostureStatus.Forward, "sent lean forward posture data but didn't get 'forward' response")
         testCalculatePostureStatusGood() // send some more good posture data
         // then send data representing lean back posture data
         for _ in 1...triggerCount {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: minSense, max: -gyroTrigger-1)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
-            XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.Back, "sent lean back posture data but didn't get 'back' response")
+            prepSensorData(PostureStatus.Back)
+            status = vc!.calculatePostureStatus(testSensor)
         }
+        XCTAssert( status == PostureStatus.Back, "sent lean back posture data but didn't get 'back' response")
         testCalculatePostureStatusGood() // send some more good posture data
         // then send data representing lean left posture data
         for _ in 1...triggerCount {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: gyroTrigger+1, max: maxSense)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
-            XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.Left, "sent lean left posture data but didn't get 'left' response")
+            prepSensorData(PostureStatus.Left)
+            status = vc!.calculatePostureStatus(testSensor)
         }
+        XCTAssert( status == PostureStatus.Left, "sent lean left posture data but didn't get 'left' response")
         testCalculatePostureStatusGood() // send some more good posture data
         // then send data representing lean right posture data
         for _ in 1...triggerCount {
-            testSensor.accel.x = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.y = Float.random(min: minSense, max: maxSense)
-            testSensor.accel.z = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.x = Float.random(min: -gyroTrigger, max: gyroTrigger)
-            testSensor.gyro.y = Float.random(min: minSense, max: maxSense)
-            testSensor.gyro.z = Float.random(min: minSense, max: -gyroTrigger-1)
-            testSensor.mag.x = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.y = Float.random(min: minSense, max: maxSense)
-            testSensor.mag.z = Float.random(min: minSense, max: maxSense)
-            XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.Right, "sent lean right posture data but didn't get 'right' response")
+            prepSensorData(PostureStatus.Right)
+            status = vc!.calculatePostureStatus(testSensor)
         }
+        XCTAssert( status == PostureStatus.Right, "sent lean right posture data but didn't get 'right' response")
     }
     
     func testParseBadData() {
@@ -191,17 +147,19 @@ class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
         var dataGood: Bool = false
         let parsed = vc!.parse("!A0-1037.00@-14939.00@6112.00!G0194.00@-116.00@-266.00!M0870.00@-3623.00@-1348.00")
         XCTAssert(parsed != nil, "parsed returned a nil value to good data")
-        dataGood =
-            parsed!.accel.x == -1037.00 &&
-            parsed!.accel.y == -14939.00 &&
-            parsed!.accel.z == 6112.00 &&
-            parsed!.gyro.x == 194.00 &&
-            parsed!.gyro.y == -116.00 &&
-            parsed!.gyro.z == -266.00 &&
-            parsed!.mag.x == 870.00 &&
-            parsed!.mag.y == -3623.00 &&
-            parsed!.mag.z == -1348.00
-        XCTAssert(dataGood == true, "parsed returned incorrect SensorData")
+        if (parsed != nil) {
+            dataGood =
+                parsed!.accel.x == -1037 &&
+                parsed!.accel.y == -14939 &&
+                parsed!.accel.z == 6112 &&
+                parsed!.gyro.x == 194 &&
+                parsed!.gyro.y == -116 &&
+                parsed!.gyro.z == -266 &&
+                parsed!.mag.x == 870 &&
+                parsed!.mag.y == -3623 &&
+                parsed!.mag.z == -1348
+            XCTAssert(dataGood == true, "parsed returned incorrect SensorData")
+        }
     }
     
     func testunParseBadData() {
