@@ -89,9 +89,8 @@ class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
             testSensor.gyro.x = randomSense(min: -gyroTrigger-gyroTrigger/triggerCount, max: -gyroTrigger-1)
             XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.OK, "sent too few lean back posture data but didn't get OK response")
         }
-        // nullify any lingering "back" measurements with a forward one
-        testSensor.gyro.x = randomSense(min: gyroTrigger+1, max: gyroTrigger+gyroTrigger/triggerCount)
-        XCTAssert(vc!.calculatePostureStatus(testSensor) == PostureStatus.OK, "sent too few lean forward posture data but didn't get OK response")
+        // nullify any lingering "back" measurements with some good ones
+        testCalculatePostureStatusGood()
         // then send data representing lean left posture data
         for _ in 1..<triggerCount {
             prepSensorData(PostureStatus.Left)
