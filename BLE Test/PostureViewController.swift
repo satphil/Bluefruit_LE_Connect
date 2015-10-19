@@ -74,7 +74,7 @@ class PostureViewController: UIViewController {
     
     func transmitTX(tx:NSString){
         // 'tx' is the bluetooth command transmission as a string
-        
+        // from iPhone to Flora
         let data = NSData(bytes: tx.UTF8String, length: tx.length)
         delegate?.sendData(data)
         
@@ -82,6 +82,7 @@ class PostureViewController: UIViewController {
     
     func receiveRX(rx:NSString) {
         // 'rx' is the bluetooth data transmission as a string
+        // from Flora to iPhone
         NSLog("Transmission: %@", rx);
     }
     
