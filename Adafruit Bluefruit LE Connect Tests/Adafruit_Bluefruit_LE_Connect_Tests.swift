@@ -24,7 +24,6 @@ class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
         super.setUp()
         // Put setup code here. This method is called before the invocation of each test method in the class.
         vc = PostureViewController()
-        srandom(UInt32(time(nil)))
     }
     
     override func tearDown() {

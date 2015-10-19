@@ -140,21 +140,22 @@ class PostureViewController: UIViewController {
         if case 0...4 = tx {
             return "!B\(tx)@"
         }
-        
         return ""
     }
     
     func calculatePostureStatus(sensorData:SensorData)->PostureStatus {
-        var runningAvg: Int
+        var movingAvg: Int
+        
         sumX -= ax[0] // ignore oldest gyro.x value
         for i in 0..<ax.count-1 {
             ax[i] = ax[i+1] // shunt older values back
         }
         ax[ax.count-1] = sensorData.gyro.x // introduce new value
         sumX += ax[ax.count-1] // new sum of last three values
-        runningAvg = sumX/ax.count
-        if runningAvg > gyroTrigger {return PostureStatus.Forward}
-        else if runningAvg < -gyroTrigger {return PostureStatus.Back}
+        movingAvg = sumX/ax.count
+        
+        if movingAvg > gyroTrigger {return PostureStatus.Forward}
+        else if movingAvg < -gyroTrigger {return PostureStatus.Back}
         
         sumZ -= az[0] // ignore oldest gyro.x value
         for i in 0..<az.count-1 {
@@ -162,9 +163,10 @@ class PostureViewController: UIViewController {
         }
         az[az.count-1] = sensorData.gyro.z // introduce new value
         sumZ += az[az.count-1] // new sum of last three values
-        runningAvg = sumZ/az.count
-        if runningAvg > gyroTrigger {return PostureStatus.Left}
-        else if runningAvg < -gyroTrigger {return PostureStatus.Right}
+        movingAvg = sumZ/az.count
+        
+        if movingAvg > gyroTrigger {return PostureStatus.Left}
+        else if movingAvg < -gyroTrigger {return PostureStatus.Right}
         
         return PostureStatus.OK
     }
@@ -174,7 +176,6 @@ class PostureViewController: UIViewController {
     }
     
     func receiveData(rxData : NSData){
-        
         if (isViewLoaded() && view.window != nil) {
             let rx = NSString(bytes: rxData.bytes, length: rxData.length, encoding: NSUTF8StringEncoding)
             receiveRX(rx!);
