@@ -75,6 +75,10 @@ class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
     func testCalculatePostureStatusMixed() {
         // send mix of bad posture data but fewer than triggerCount in a row
         testCalculatePostureStatusGood() // send some good posture data to begin with
+        prepSensorData(PostureStatus.Back) // then two opposite to forward
+        testSensor.gyro.x = randomSense(min: -gyroTrigger-gyroTrigger/triggerCount, max: -gyroTrigger-1)
+        status = vc!.calculatePostureStatus(testSensor)
+        status = vc!.calculatePostureStatus(testSensor) // send it twice
         // then send data representing lean forward posture data
         
         for _ in 1..<triggerCount {
@@ -90,6 +94,10 @@ class Adafruit_Bluefruit_LE_Connect_Tests: XCTestCase {
         }
         // nullify any lingering "back" measurements with some good ones
         testCalculatePostureStatusGood()
+        prepSensorData(PostureStatus.Right) // then two opposite to left
+        testSensor.gyro.z = randomSense(min: -gyroTrigger-gyroTrigger/triggerCount, max: -gyroTrigger-1)
+        status = vc!.calculatePostureStatus(testSensor)
+        status = vc!.calculatePostureStatus(testSensor)
         // then send data representing lean left posture data
         for _ in 1..<triggerCount {
             prepSensorData(PostureStatus.Left)

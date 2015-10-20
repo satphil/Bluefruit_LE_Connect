@@ -83,7 +83,10 @@ class PostureViewController: UIViewController {
     func receiveRX(rx:NSString) {
         // 'rx' is the bluetooth data transmission as a string
         // from Flora to iPhone
+        // This routine is called by iOS when Bluetooth data arrives
         NSLog("Transmission: %@", rx);
+        
+        
     }
     
     func parse(rx:NSString)->SensorData? {
@@ -182,6 +185,7 @@ class PostureViewController: UIViewController {
         }
         
     }
+    
 }
 
 
