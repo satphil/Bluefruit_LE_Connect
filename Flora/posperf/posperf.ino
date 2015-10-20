@@ -119,7 +119,7 @@ void setup(void)
   delay(500);
 
   Serial.begin(115200);
-  while (! Serial); // do nothing until serial is ready
+//  while (! Serial); // do nothing until serial is ready
   Serial.println(F("Posture Perfector"));
   Serial.println(F("-----------------"));
 

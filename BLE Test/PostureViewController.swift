@@ -86,6 +86,20 @@ class PostureViewController: UIViewController {
         // This routine is called by iOS when Bluetooth data arrives
         NSLog("Transmission: %@", rx);
         
+        // Log of typical received data:
+//        2015-10-20 18:38:50.319 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1859.00@-5229.00
+//        2015-10-20 18:38:50.559 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14471.00!G012.00@-2
+//        2015-10-20 18:38:50.799 Adafruit Bluefruit LE Connect[224:13769] Transmission: 6.00@-111.00!M0753.0
+//        2015-10-20 18:38:50.979 Adafruit Bluefruit LE Connect[224:13769] Transmission: 0@259.00@-4782.00
+//        2015-10-20 18:38:51.249 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1788.00@-5215.00
+//        2015-10-20 18:38:51.429 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14437.00!G023.00@51
+//        2015-10-20 18:38:51.670 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-109.00!M0740.00
+//        2015-10-20 18:38:51.849 Adafruit Bluefruit LE Connect[224:13769] Transmission: @274.00@-4791.00
+//        2015-10-20 18:38:52.089 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1814.00@-5173.00
+//        2015-10-20 18:38:52.329 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14478.00!G036.00@70
+//        2015-10-20 18:38:52.539 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-157.00!M0733.00
+//        2015-10-20 18:38:52.719 Adafruit Bluefruit LE Connect[224:13769] Transmission: @267.00@-4803.00
+       
         //if rx.length < 3 {return}
         //while rx[0] != "!" {
         //    rx.removeAtIndex(rx.startIndex)
