@@ -86,7 +86,10 @@ class PostureViewController: UIViewController {
         // This routine is called by iOS when Bluetooth data arrives
         NSLog("Transmission: %@", rx);
         
-        
+        if rx.length < 3 {return}
+        while rx[0] != "!" {
+            rx.removeAtIndex(rx.startIndex)
+        }
     }
     
     func parse(rx:NSString)->SensorData? {
@@ -98,7 +101,7 @@ class PostureViewController: UIViewController {
             accel: Vector(x: 0,y: 0,z: 0),
             mag: Vector(x: 0,y: 0,z: 0),
             gyro: Vector(x: 0,y: 0,z: 0))
-        var vector = rx.componentsSeparatedByString("!") // split into vectors
+        var vector = rx.componentsSeparatedByString("!") // split into vector strings
         if vector.count != 4 || vector[0] != ""  { return nil } // first character is supposed to be "!" so first split should be empty string
         // then there should be one vector for each of array, gyro and mag so a total of 4 entries
         for i in 1...3 {
