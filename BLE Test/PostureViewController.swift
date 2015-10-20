@@ -86,10 +86,12 @@ class PostureViewController: UIViewController {
         // This routine is called by iOS when Bluetooth data arrives
         NSLog("Transmission: %@", rx);
         
-        if rx.length < 3 {return}
-        while rx[0] != "!" {
-            rx.removeAtIndex(rx.startIndex)
-        }
+        //if rx.length < 3 {return}
+        //while rx[0] != "!" {
+        //    rx.removeAtIndex(rx.startIndex)
+        //}
+        
+        transmitTX("!B4@")
     }
     
     func parse(rx:NSString)->SensorData? {
