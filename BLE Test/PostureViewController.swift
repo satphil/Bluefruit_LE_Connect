@@ -99,6 +99,20 @@ class PostureViewController: UIViewController {
 //        2015-10-20 18:38:52.329 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14478.00!G036.00@70
 //        2015-10-20 18:38:52.539 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-157.00!M0733.00
 //        2015-10-20 18:38:52.719 Adafruit Bluefruit LE Connect[224:13769] Transmission: @267.00@-4803.00
+        
+//        2015-10-20 18:46:26.524 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-5876.0
+//        2015-10-20 18:46:26.734 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3888.00@14384.00!
+//        2015-10-20 18:46:32.854 Adafruit Bluefruit LE Connect[229:15830] Transmission: G030.00@-15.00@-118.
+//        2015-10-20 18:46:39.035 Adafruit Bluefruit LE Connect[229:15830] Transmission: 00!M0-85!A0-5954AT+B
+//        2015-10-20 18:46:39.274 Adafruit Bluefruit LE Connect[229:15830] Transmission: LEUARTTX!A0-5857.AT+
+//        2015-10-20 18:46:39.484 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-5901.0
+//        2015-10-20 18:46:39.664 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3895.00@14255.00!
+//        2015-10-20 18:46:45.814 Adafruit Bluefruit LE Connect[229:15830] Transmission: G065.00@25.00@-129.0
+//        2015-10-20 18:46:52.025 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0!M0-858!A0-6066.AT+
+//        2015-10-20 18:46:52.234 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTT!A0-5884.AT+
+//        2015-10-20 18:46:52.444 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-6030.0
+//        2015-10-20 18:46:52.624 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3993.00@14439.00!
+//        2015-10-20 18:46:58.774 Adafruit Bluefruit LE Connect[229:15830] Transmission: G0-35.00@-23.00@-139
        
         //if rx.length < 3 {return}
         //while rx[0] != "!" {
