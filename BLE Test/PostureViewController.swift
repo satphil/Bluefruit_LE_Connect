@@ -62,6 +62,7 @@ class PostureViewController: UIViewController {
     var ax = [Int](count: triggerCount, repeatedValue: 0)
     var az = [Int](count: triggerCount, repeatedValue: 0)
     var sumX=0, sumZ=0, cycle=0
+    var parseString = ""
     
     
     override func viewDidLoad(){
@@ -87,43 +88,81 @@ class PostureViewController: UIViewController {
         NSLog("Transmission: %@", rx);
         
         // Log of typical received data:
-//        2015-10-20 18:38:50.319 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1859.00@-5229.00
-//        2015-10-20 18:38:50.559 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14471.00!G012.00@-2
-//        2015-10-20 18:38:50.799 Adafruit Bluefruit LE Connect[224:13769] Transmission: 6.00@-111.00!M0753.0
-//        2015-10-20 18:38:50.979 Adafruit Bluefruit LE Connect[224:13769] Transmission: 0@259.00@-4782.00
-//        2015-10-20 18:38:51.249 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1788.00@-5215.00
-//        2015-10-20 18:38:51.429 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14437.00!G023.00@51
-//        2015-10-20 18:38:51.670 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-109.00!M0740.00
-//        2015-10-20 18:38:51.849 Adafruit Bluefruit LE Connect[224:13769] Transmission: @274.00@-4791.00
-//        2015-10-20 18:38:52.089 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1814.00@-5173.00
-//        2015-10-20 18:38:52.329 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14478.00!G036.00@70
-//        2015-10-20 18:38:52.539 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-157.00!M0733.00
-//        2015-10-20 18:38:52.719 Adafruit Bluefruit LE Connect[224:13769] Transmission: @267.00@-4803.00
+        //        2015-10-20 18:38:50.319 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1859.00@-5229.00
+        //        2015-10-20 18:38:50.559 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14471.00!G012.00@-2
+        //        2015-10-20 18:38:50.799 Adafruit Bluefruit LE Connect[224:13769] Transmission: 6.00@-111.00!M0753.0
+        //        2015-10-20 18:38:50.979 Adafruit Bluefruit LE Connect[224:13769] Transmission: 0@259.00@-4782.00
+        //        2015-10-20 18:38:51.249 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1788.00@-5215.00
+        //        2015-10-20 18:38:51.429 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14437.00!G023.00@51
+        //        2015-10-20 18:38:51.670 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-109.00!M0740.00
+        //        2015-10-20 18:38:51.849 Adafruit Bluefruit LE Connect[224:13769] Transmission: @274.00@-4791.00
+        //        2015-10-20 18:38:52.089 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1814.00@-5173.00
+        //        2015-10-20 18:38:52.329 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14478.00!G036.00@70
+        //        2015-10-20 18:38:52.539 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-157.00!M0733.00
+        //        2015-10-20 18:38:52.719 Adafruit Bluefruit LE Connect[224:13769] Transmission: @267.00@-4803.00
         
-//        2015-10-20 18:46:26.524 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-5876.0
-//        2015-10-20 18:46:26.734 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3888.00@14384.00!
-//        2015-10-20 18:46:32.854 Adafruit Bluefruit LE Connect[229:15830] Transmission: G030.00@-15.00@-118.
-//        2015-10-20 18:46:39.035 Adafruit Bluefruit LE Connect[229:15830] Transmission: 00!M0-85!A0-5954AT+B
-//        2015-10-20 18:46:39.274 Adafruit Bluefruit LE Connect[229:15830] Transmission: LEUARTTX!A0-5857.AT+
-//        2015-10-20 18:46:39.484 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-5901.0
-//        2015-10-20 18:46:39.664 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3895.00@14255.00!
-//        2015-10-20 18:46:45.814 Adafruit Bluefruit LE Connect[229:15830] Transmission: G065.00@25.00@-129.0
-//        2015-10-20 18:46:52.025 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0!M0-858!A0-6066.AT+
-//        2015-10-20 18:46:52.234 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTT!A0-5884.AT+
-//        2015-10-20 18:46:52.444 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-6030.0
-//        2015-10-20 18:46:52.624 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3993.00@14439.00!
-//        2015-10-20 18:46:58.774 Adafruit Bluefruit LE Connect[229:15830] Transmission: G0-35.00@-23.00@-139
-       
-        //if rx.length < 3 {return}
-        //while rx[0] != "!" {
-        //    rx.removeAtIndex(rx.startIndex)
-        //}
+        //        2015-10-20 18:46:26.524 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-5876.0
+        //        2015-10-20 18:46:26.734 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3888.00@14384.00!
+        //        2015-10-20 18:46:32.854 Adafruit Bluefruit LE Connect[229:15830] Transmission: G030.00@-15.00@-118.
+        //        2015-10-20 18:46:39.035 Adafruit Bluefruit LE Connect[229:15830] Transmission: 00!M0-85!A0-5954AT+B
+        //        2015-10-20 18:46:39.274 Adafruit Bluefruit LE Connect[229:15830] Transmission: LEUARTTX!A0-5857.AT+
+        //        2015-10-20 18:46:39.484 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-5901.0
+        //        2015-10-20 18:46:39.664 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3895.00@14255.00!
+        //        2015-10-20 18:46:45.814 Adafruit Bluefruit LE Connect[229:15830] Transmission: G065.00@25.00@-129.0
+        //        2015-10-20 18:46:52.025 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0!M0-858!A0-6066.AT+
+        //        2015-10-20 18:46:52.234 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTT!A0-5884.AT+
+        //        2015-10-20 18:46:52.444 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-6030.0
+        //        2015-10-20 18:46:52.624 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3993.00@14439.00!
+        //        2015-10-20 18:46:58.774 Adafruit Bluefruit LE Connect[229:15830] Transmission: G0-35.00@-23.00@-139
         
-        transmitTX("!B\(cycle)@")
-        if ++cycle > 4 { cycle = 0 }
+        var rxString = rx as String
+        var rangeBangA0: Range<String.Index>?
+        
+        if rxString.hasPrefix("!A0") {
+            parseString=rxString
+        } else if !parseString.isEmpty {
+            parseString += rxString
+        } else {
+            rangeBangA0 = rxString.rangeOfString("!A0")
+            if let rangeBangA0 = rangeBangA0 {
+                // ignore part of string leading up to !A0
+                parseString = rxString.substringFromIndex(rangeBangA0.startIndex)
+            }
+        }
+        
+        // Check to see if we've got a full string ready for parsing
+        if parseString.rangeOfString("!A0") == nil ||
+            parseString.rangeOfString("!G0") == nil ||
+            parseString.rangeOfString("!M0") == nil ||
+            parseString.componentsSeparatedByString("@").count <= 7 ||
+            !parseString.hasSuffix(".00") ||
+            parseString.characters.count < 100 {
+                return  // receive more of transmission before parsing
+        }
+        
+        if let sensorData = parse(parseString) {
+            let posture = calculatePostureStatus(sensorData)
+            switch posture {
+            case PostureStatus.Left:
+                transmitTX("!B0@")
+            case PostureStatus.Forward:
+                transmitTX("!B1@")
+            case PostureStatus.Right:
+                transmitTX("!B2@")
+            case PostureStatus.Back:
+                transmitTX("!B3@")
+            default:
+                transmitTX("!B4@")
+            }
+        } else {
+            NSLog("Failed parse: %@", parseString);
+            // better luck next time
+        }
+        
+        parseString = ""
     }
     
-    func parse(rx:NSString)->SensorData? {
+    func parse(rx:String)->SensorData? {
         // typical input string: !A0-1037.00@-14939.00@6112.00!G0194.00@-116.00@-266.00!M0870.00@-3623.00@-1348.00
         // use it to fill a sensorData structure
         // if an error, return nil structure

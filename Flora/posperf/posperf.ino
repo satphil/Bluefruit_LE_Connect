@@ -66,6 +66,7 @@ Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0();
 
 const int motorPin[3] = {10, 9, 6}; // array declaring which pins to use for vibe motors left, middle and right
 int motor = 0; // index into motorPin
+int buzz = 1; // number of buzzes of motor
 const int speed = 200; // to buzz vibe motor, drive pin at this speed (max = 255)
 const int turnOff = 0; //turn off vibe motor
 int a; // index into action for each motor
@@ -125,7 +126,7 @@ void setup(void)
 
   strip.begin();
   strip.show();
-  strip.setPixelColor(0, strip.Color(0, 0, 7)); // 
+  strip.setPixelColor(0, strip.Color(0, 0, 7)); // Blue light
   strip.show();
 
   /* Initialise the module */
@@ -238,28 +239,30 @@ void loop(void)
  // Expecting command of format "!Bn@" for n in 0..3
  // 0 implying no buzzers; 1..3 implying buzzer 1..3
  Serial.print(F("[Recv] ")); Serial.println(ble.buffer);
- 
+
+ buzz = 1;
  if (strcmp(ble.buffer, "!B0@") == 0) {
-     // buzz left vibe motor
+     // leaning left, buzz left vibe motor
      motor = 0; // arrays indexed from zero so left motor is motor zero
      strip.setPixelColor(0, strip.Color(7, 0, 7)); // red+blue= magenta light
   } else 
     if (strcmp(ble.buffer, "!B1@") == 0) {
-       // buzz middle vibe motor
+       // leaning forward, buzz middle vibe motor twice
        motor = 1;
+       buzz = 2;
        strip.setPixelColor(0, strip.Color(7, 7, 0)); // red+green= yellow light
      } else 
        if (strcmp(ble.buffer, "!B2@") == 0) {
-         // buzz right vibe motor
+         // leaning right, buzz right vibe motor
          motor = 2;
          strip.setPixelColor(0, strip.Color(0, 7, 7)); // green+blue= cyan light
        } else 
          if (strcmp(ble.buffer, "!B3@") == 0) {
-           // posture is OK
-           motor = 3;      // no vibe motor is buzzed
+           // leaning back, buzz middle vibe motor once
+           motor = 1;      
            strip.setPixelColor(0, strip.Color(0, 7, 0)); // green light
           } else  { 
-              Serial.println(F("Unexpected response from iPhone"));
+              // posture OK
               motor = 4;   // no vibe motor to be buzzed
               strip.setPixelColor(0, strip.Color(7, 0, 0)); // red light!
             }
@@ -267,13 +270,16 @@ void loop(void)
 
  for (a = 0; a <= 2 ; a++) { //cycle through actions for each motor
    if ( a == motor ) {   // is this motor to be turned on?
+    while ( buzz > 0 ) {
      analogWrite(motorPin[a], speed); // turn on motor
      delay (500);                     // buzz for half a second (if on) 
+     buzz--;
+    }
    }
    analogWrite(motorPin[a], turnOff);   // then turn off (all) motors
  }
-  
- if (! ble.waitForOK() ) {
+
+  if (! ble.waitForOK() ) {
    Serial.println(F("Failed to receive from iPhone via Bluetooth?"));
  }
 
