@@ -61,7 +61,7 @@ class PostureViewController: UIViewController {
     
     var ax = [Int](count: triggerCount, repeatedValue: 0)
     var az = [Int](count: triggerCount, repeatedValue: 0)
-    var sumX=0, sumZ=0
+    var sumX=0, sumZ=0, cycle=0
     
     
     override func viewDidLoad(){
@@ -119,7 +119,8 @@ class PostureViewController: UIViewController {
         //    rx.removeAtIndex(rx.startIndex)
         //}
         
-        transmitTX("!B4@")
+        transmitTX("!B\(cycle)@")
+        if ++cycle > 4 { cycle = 0 }
     }
     
     func parse(rx:NSString)->SensorData? {

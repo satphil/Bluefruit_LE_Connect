@@ -231,6 +231,7 @@ void loop(void)
  ble.readline();
  if (strcmp(ble.buffer, "OK") == 0) {
    // no data
+   Serial.println(F("received no data from Bluetooth"));
    return;
  }
  // Some data was found, it's in the buffer

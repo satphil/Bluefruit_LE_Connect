@@ -466,7 +466,7 @@
 						TestTargetID = F0A2C96516BBE44500F2FD12;
 					};
 					F0A2C96516BBE44500F2FD12 = {
-						DevelopmentTeam = SGUQEHQSRR;
+						DevelopmentTeam = 34VH7L434X;
 						SystemCapabilities = {
 							com.apple.iCloud = {
 								enabled = 0;
@@ -789,7 +789,7 @@
 				INFOPLIST_FILE = "BLE Test/BluetoothLE Test-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.communica.posture;
+				PRODUCT_BUNDLE_IDENTIFIER = com.communica.posperf;
 				PRODUCT_NAME = "Adafruit Bluefruit LE Connect";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "BLE Test/BluetoothLE Test-Bridging-Header.h";
@@ -811,9 +811,9 @@
 				INFOPLIST_FILE = "BLE Test/BluetoothLE Test-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.communica.posture;
+				PRODUCT_BUNDLE_IDENTIFIER = com.communica.posperf;
 				PRODUCT_NAME = "Adafruit Bluefruit LE Connect";
-				PROVISIONING_PROFILE = "2f993dd5-5f8c-4144-9ab0-c1865cda0990";
+				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "BLE Test/BluetoothLE Test-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
@@ -829,6 +829,7 @@
 				8D976A7D1BC5120F00073FAB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F0A2C96116BBE44500F2FD12 /* Build configuration list for PBXProject "Adafruit Bluefruit LE Connect" */ = {
 			isa = XCConfigurationList;
