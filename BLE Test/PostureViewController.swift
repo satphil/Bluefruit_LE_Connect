@@ -62,7 +62,7 @@ class PostureViewController: UIViewController {
     var ax = [Int](count: triggerCount, repeatedValue: 0)
     var az = [Int](count: triggerCount, repeatedValue: 0)
     var sumX=0, sumZ=0, cycle=0
-    var parseString = ""
+    var parseString = "", nextString = ""
     
     
     override func viewDidLoad(){
@@ -101,58 +101,77 @@ class PostureViewController: UIViewController {
         //        2015-10-20 18:38:52.539 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-157.00!M0733.00
         //        2015-10-20 18:38:52.719 Adafruit Bluefruit LE Connect[224:13769] Transmission: @267.00@-4803.00
         
-        //        2015-10-20 18:46:26.524 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-5876.0
-        //        2015-10-20 18:46:26.734 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3888.00@14384.00!
-        //        2015-10-20 18:46:32.854 Adafruit Bluefruit LE Connect[229:15830] Transmission: G030.00@-15.00@-118.
-        //        2015-10-20 18:46:39.035 Adafruit Bluefruit LE Connect[229:15830] Transmission: 00!M0-85!A0-5954AT+B
-        //        2015-10-20 18:46:39.274 Adafruit Bluefruit LE Connect[229:15830] Transmission: LEUARTTX!A0-5857.AT+
-        //        2015-10-20 18:46:39.484 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-5901.0
-        //        2015-10-20 18:46:39.664 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3895.00@14255.00!
-        //        2015-10-20 18:46:45.814 Adafruit Bluefruit LE Connect[229:15830] Transmission: G065.00@25.00@-129.0
-        //        2015-10-20 18:46:52.025 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0!M0-858!A0-6066.AT+
-        //        2015-10-20 18:46:52.234 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTT!A0-5884.AT+
-        //        2015-10-20 18:46:52.444 Adafruit Bluefruit LE Connect[229:15830] Transmission: BLEUARTTX=!A0-6030.0
-        //        2015-10-20 18:46:52.624 Adafruit Bluefruit LE Connect[229:15830] Transmission: 0@-3993.00@14439.00!
-        //        2015-10-20 18:46:58.774 Adafruit Bluefruit LE Connect[229:15830] Transmission: G0-35.00@-23.00@-139
         
         var rxString = rx as String
         var rangeBangA0: Range<String.Index>?
         
+        // if we had a fragment of string left over from last transmission, 
+        // use it to start next parse string
+        if !nextString.isEmpty {
+            parseString = nextString
+            nextString = ""
+        }
+        
         if rxString.hasPrefix("!A0") {
-            parseString=rxString
-        } else if !parseString.isEmpty {
-            parseString += rxString
+            parseString=rxString // if rx string begins with !A0, use it as start of parse string
         } else {
+            // look for !A0 elsewhere in string
             rangeBangA0 = rxString.rangeOfString("!A0")
-            if let rangeBangA0 = rangeBangA0 {
-                // ignore part of string leading up to !A0
-                parseString = rxString.substringFromIndex(rangeBangA0.startIndex)
+            if let foundBangA0 = rangeBangA0 {
+                // rxString doesn't begin with !A0 but has it later on
+                if parseString.isEmpty {
+                    // ignore part of string leading up to !A0, and start parse string from here
+                    parseString = rxString.substringFromIndex(foundBangA0.startIndex)
+                } else {
+                    // if already got a string starting with !A0,
+                    // so append rx string up until second !A0
+                    parseString += rxString.substringToIndex(foundBangA0.startIndex)
+                    nextString = rxString.substringFromIndex(foundBangA0.startIndex)
+                }
+            } else {
+                // no !A0 found, so
+                if !parseString.isEmpty {
+                    // append it if parse string already started
+                    parseString += rxString
+                } // don't start parse string until a !A0 is found
             }
         }
         
         // Check to see if we've got a full string ready for parsing
+        //        if parseString.rangeOfString("!A0") == nil {NSLog("no !A0"); return}
+        //        if parseString.rangeOfString("!G0") == nil {NSLog("no !G0"); return}
+        //        if parseString.rangeOfString("!M0") == nil {NSLog("no !M0"); return}
+        //        let atCount = parseString.componentsSeparatedByString("@").count
+        //        if atCount < 7 {NSLog("atCount \(atCount)") ; return }
+        //        if !parseString.hasSuffix(".00") {NSLog("no .00 suffix"); return}
+        //        //if parseString.characters.count < 100 {NSLog("parse.count \(parseString.characters.count)"); return}
         if parseString.rangeOfString("!A0") == nil ||
             parseString.rangeOfString("!G0") == nil ||
             parseString.rangeOfString("!M0") == nil ||
-            parseString.componentsSeparatedByString("@").count <= 7 ||
-            !parseString.hasSuffix(".00") ||
-            parseString.characters.count < 100 {
+            parseString.componentsSeparatedByString("@").count < 7 ||
+            !parseString.hasSuffix(".00") {
+                if parseString.characters.count > 100 {
+                    // String shouldn't be longer than 100; log error, empty string and try again
+                    NSLog("parseString too long: \(parseString.characters.count)")
+                    parseString = ""
+                }
                 return  // receive more of transmission before parsing
         }
+        // receive more of transmission before parsing
         
         if let sensorData = parse(parseString) {
             let posture = calculatePostureStatus(sensorData)
             switch posture {
             case PostureStatus.Left:
-                transmitTX("!B0@")
+                transmitTX("!B0@") ; NSLog("Left")
             case PostureStatus.Forward:
-                transmitTX("!B1@")
+                transmitTX("!B1@") ; NSLog("Forward")
             case PostureStatus.Right:
-                transmitTX("!B2@")
+                transmitTX("!B2@") ; NSLog("Right")
             case PostureStatus.Back:
-                transmitTX("!B3@")
+                transmitTX("!B3@") ; NSLog("Back")
             default:
-                transmitTX("!B4@")
+                transmitTX("!B4@") ; NSLog("OK")
             }
         } else {
             NSLog("Failed parse: %@", parseString);
