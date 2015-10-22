@@ -27,7 +27,7 @@ Helen Diacono, 20 Oct 2015
 #include <Wire.h>
 #include <Arduino.h>
 #include <SPI.h>
-// #include <Adafruit_NeoPixel.h>
+#include <Adafruit_NeoPixel.h>
 #include <Adafruit_LSM9DS0.h>
 #include <Adafruit_Sensor.h>
 #if not defined (_VARIANT_ARDUINO_DUE_X_) && not defined (_VARIANT_ARDUINO_ZERO_)
@@ -59,14 +59,14 @@ Adafruit_BluefruitLE_UART ble(bluefruitSS, BLUEFRUIT_UART_MODE_PIN,
 //                             BLUEFRUIT_SPI_MOSI, BLUEFRUIT_SPI_CS,
 //                             BLUEFRUIT_SPI_IRQ, BLUEFRUIT_SPI_RST);
 
-// Initialise NeoPixel strip
-//Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, 6, NEO_GRB + NEO_KHZ800);
-
+// Initialise NeoPixel on Flora
+#define PIN 8
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(1, PIN, NEO_GRB + NEO_KHZ800);
+ 
 // i2c 
 // initialise 9dof sensor
 Adafruit_LSM9DS0 lsm = Adafruit_LSM9DS0();
 
-const int led = 7;
 const int motorPin[3] = {10, 9, 6}; // array declaring which pins to use for vibe motors left, middle and right
 int motor = 0; // index into motorPin
 int buzz = 1; // number of buzzes of motor
@@ -117,7 +117,7 @@ void setup(void)
   for (motor = 0; motor <= 2; motor++) 
     pinMode(motorPin[motor], OUTPUT); // declaring pins driving vibe motors are output pins
 
-    pinMode(led, OUTPUT); // as is pin driving LED on Flora board    
+    //pinMode(led, OUTPUT); // as is pin driving LED on Flora board    
 
 //  while (!Serial) {
 //  
@@ -129,12 +129,12 @@ void setup(void)
   Serial.println(F("Posture Perfector"));
   Serial.println(F("-----------------"));
 
-//  strip.begin();
-//  strip.show();
-//  strip.setPixelColor(0, strip.Color(0, 0, 7)); // Blue light
-//  strip.show();
+  strip.begin();
+  strip.show();
+  strip.setPixelColor(0, strip.Color(0, 0, 0)); // turn off light
+  strip.show();
 
-  digitalWrite(led, LOW);   // turn the LED off 
+  //digitalWrite(led, LOW);   // turn the LED off 
 
   /* Initialise the module */
   Serial.print(F("Initialising the Bluefruit LE module: "));
@@ -252,33 +252,35 @@ void loop(void)
      // leaning left, buzz left vibe motor
      motor = 0; // arrays indexed from zero so left motor is motor zero
      //strip.setPixelColor(0, strip.Color(7, 0, 7)); // red+blue= magenta light
-     digitalWrite(led, HIGH);   // turn the LED on 
+     strip.setPixelColor(0, strip.Color(0, 7, 0)); // green light means Lefty
+     //digitalWrite(led, HIGH);   // turn the LED on 
   } else 
     if (strcmp(ble.buffer, "!B1@") == 0) {
        // leaning forward, buzz middle vibe motor twice
        motor = 1;
        buzz = 2;
-       //strip.setPixelColor(0, strip.Color(7, 7, 0)); // red+green= yellow light
-       digitalWrite(led, HIGH);   // turn the LED on 
+       strip.setPixelColor(0, strip.Color(7, 0, 0)); // red means forward
+       //digitalWrite(led, HIGH);   // turn the LED on 
      } else 
        if (strcmp(ble.buffer, "!B2@") == 0) {
          // leaning right, buzz right vibe motor
          motor = 2;
          //strip.setPixelColor(0, strip.Color(0, 7, 7)); // green+blue= cyan light
-         digitalWrite(led, HIGH);   // turn the LED on 
+         strip.setPixelColor(0, strip.Color(0, 0, 7)); // blue means Righty
+         //digitalWrite(led, HIGH);   // turn the LED on 
        } else 
          if (strcmp(ble.buffer, "!B3@") == 0) {
            // leaning back, buzz middle vibe motor once
            motor = 1;      
-           //strip.setPixelColor(0, strip.Color(0, 7, 0)); // green light
-           digitalWrite(led, HIGH);   // turn the LED on 
+           strip.setPixelColor(0, strip.Color(7, 7, 0)); // red+green= yellow light
+           //digitalWrite(led, HIGH);   // turn the LED on 
           } else  { 
               // posture OK
               motor = 4;   // no vibe motor to be buzzed
-              //strip.setPixelColor(0, strip.Color(7, 0, 0)); // red light!
-              digitalWrite(led, LOW);   // turn the LED on 
+              strip.setPixelColor(0, strip.Color(0, 0, 0)); // turn off light!
+              //digitalWrite(led, LOW);   // turn the LED on 
             }
-// strip.show();
+strip.show();
 
  for (a = 0; a <= 2 ; a++) { //cycle through actions for each motor
    if ( a == motor ) {   // is this motor to be turned on?
