@@ -61,7 +61,7 @@ class PostureViewController: UIViewController {
     
     var ax = [Int](count: triggerCount, repeatedValue: 0)
     var az = [Int](count: triggerCount, repeatedValue: 0)
-    var sumX=0, sumZ=0, cycle=0
+    var sumX=0, sumZ=0
     var parseString = "", nextString = ""
     
     
@@ -85,7 +85,7 @@ class PostureViewController: UIViewController {
         // 'rx' is the bluetooth data transmission as a string
         // from Flora to iPhone
         // This routine is called by iOS when Bluetooth data arrives
-        NSLog("Transmission: %@", rx);
+        //NSLog("Transmission: %@", rx);
         
         // Log of typical received data:
         //        2015-10-20 18:38:50.319 Adafruit Bluefruit LE Connect[224:13769] Transmission: !A0-1859.00@-5229.00
@@ -100,7 +100,6 @@ class PostureViewController: UIViewController {
         //        2015-10-20 18:38:52.329 Adafruit Bluefruit LE Connect[224:13769] Transmission: @14478.00!G036.00@70
         //        2015-10-20 18:38:52.539 Adafruit Bluefruit LE Connect[224:13769] Transmission: .00@-157.00!M0733.00
         //        2015-10-20 18:38:52.719 Adafruit Bluefruit LE Connect[224:13769] Transmission: @267.00@-4803.00
-        
         
         var rxString = rx as String
         var rangeBangA0: Range<String.Index>?
@@ -126,6 +125,7 @@ class PostureViewController: UIViewController {
                     // if already got a string starting with !A0,
                     // so append rx string up until second !A0
                     parseString += rxString.substringToIndex(foundBangA0.startIndex)
+                    // and save rest of rx string to start new parse string next time
                     nextString = rxString.substringFromIndex(foundBangA0.startIndex)
                 }
             } else {
@@ -138,13 +138,6 @@ class PostureViewController: UIViewController {
         }
         
         // Check to see if we've got a full string ready for parsing
-        //        if parseString.rangeOfString("!A0") == nil {NSLog("no !A0"); return}
-        //        if parseString.rangeOfString("!G0") == nil {NSLog("no !G0"); return}
-        //        if parseString.rangeOfString("!M0") == nil {NSLog("no !M0"); return}
-        //        let atCount = parseString.componentsSeparatedByString("@").count
-        //        if atCount < 7 {NSLog("atCount \(atCount)") ; return }
-        //        if !parseString.hasSuffix(".00") {NSLog("no .00 suffix"); return}
-        //        //if parseString.characters.count < 100 {NSLog("parse.count \(parseString.characters.count)"); return}
         if parseString.rangeOfString("!A0") == nil ||
             parseString.rangeOfString("!G0") == nil ||
             parseString.rangeOfString("!M0") == nil ||
