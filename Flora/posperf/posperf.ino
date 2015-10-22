@@ -230,11 +230,11 @@ void loop(void)
  // Check for commands from iPhone received via Bluetooth
  ble.println("AT+BLEUARTRX");
  ble.readline();
- if (strcmp(ble.buffer, "OK") == 0) {
-   // no data
-   Serial.println(F("received no data from Bluetooth"));
-   return;
- }
+ //if (strcmp(ble.buffer, "OK") == 0) {
+ //  // no data
+ //  Serial.println(F("received no data from Bluetooth"));
+ //  return;
+ //}
  // Some data was found, it's in the buffer
  // Expecting command of format "!Bn@" for n in 0..3
  // 0 implying no buzzers; 1..3 implying buzzer 1..3
@@ -283,7 +283,7 @@ void loop(void)
    Serial.println(F("Failed to receive from iPhone via Bluetooth?"));
  }
 
- delay(750);  // 0.75s seems minimum delay between 9dof readings and bluetooth sendings
+ delay(1250);  // 1.25s seems minimum delay between 9dof readings and bluetooth sendings
 
 }
 
