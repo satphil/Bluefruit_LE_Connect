@@ -272,8 +272,9 @@ class PostureViewController: UIViewController {
     
     func receiveData(rxData : NSData){
         if (isViewLoaded() && view.window != nil) {
-            let rx = NSString(bytes: rxData.bytes, length: rxData.length, encoding: NSUTF8StringEncoding)
-            receiveRX(rx!);
+            if let rx = NSString(bytes: rxData.bytes, length: rxData.length, encoding: NSUTF8StringEncoding) {
+                receiveRX(rx);
+            }
         }
         
     }
